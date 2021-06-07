@@ -1,0 +1,58 @@
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+//钱币找零问题,求最少货币数
+
+//仿函数，降序
+struct cmp
+{
+	bool operator()(vector<int> arr1, vector<int> arr2)
+	{
+		return arr1[0] > arr2[0];
+	}
+};
+
+//TotalMoney这个二维矩阵，每个元素是一个由两个元素组成的一维矩阵，
+//分别表示货币的面值和个数
+int changeNum(vector<vector<int>>& TotalMoney, int money)
+{
+	//先将钱币按照从大到小进行排序
+	sort(TotalMoney.begin(), TotalMoney.end(), cmp());
+
+	int len = TotalMoney.size();
+	int cnt = 0;//找零的货币数
+	for (auto arr : TotalMoney)
+	{
+		//计算当前需要找零的货币数目
+		int curNum = money / arr[0];
+		curNum = min(curNum, arr[1]);
+		//总钱数更新
+		money -= curNum*arr[0];
+		//货币数累加
+		cnt += curNum;
+	}
+
+	//没找完，返回-1
+	if (money != 0)
+		return -1;
+	return cnt;
+}
+
+int main()
+{
+	vector<vector<int>> TotalOfMoney = { { 1, 15 }, { 5, 3 },
+	{ 10, 10 }, { 20, 3 }, { 50, 5 }, { 100, 10 } };
+	int money;
+	cout << "输入你要找零的钱数：";
+	cin >> money;
+	int cnt = changeNum(TotalOfMoney, money);
+	if (cnt == -1)
+		cout << "找不尽" << endl;
+	else
+	{
+		cout << "最少找" << cnt << "张" << endl;
+	}
+
+	return 0;
+}
