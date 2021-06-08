@@ -1,0 +1,75 @@
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+/*
+	某工厂有n个独立的作业，由m台相同的机器进行加工处理。
+	作业i所需的加工时间为ti，任何作业在被处理时不能中断，也不能进行拆分处理。
+	现厂长请你给他写一个程序：算出n个作业由m台机器加工处理的最短时间
+*/
+//找到最长机器运行时间
+int findMax(vector<int> machines)
+{
+	int ret = machines[0];
+	for (int i = 1; i < machines.size(); ++i)
+	{
+		ret = max(ret, machines[i]);
+	}
+	return ret;
+}
+
+//获取最短作业时间
+int getMatTime(vector<int>& taskTime, int m)
+{
+	int n = taskTime.size();
+	//进行递增排序
+	sort(taskTime.begin(), taskTime.end());
+	vector<int> machines(m, 0);//机器的最初运行时间都初始化为0
+
+	//机器数大于作业数，返回最长工作时间
+	if (n <= m)
+	{
+		return taskTime[n - 1];
+	}
+	else
+	{
+		//从作业运行时间最长的开始
+		for (int i = n - 1; i >= 0; --i)
+		{
+			//找一个最先结束的机器，分配新的任务
+			int finish = 0;
+			int machineTime = machines[finish];
+			for (int j = 1; j < m; ++j)
+			{
+				//machines代表机器的运行时间
+				if (machines[j] < machineTime)
+				{
+					finish = j;
+					machineTime = machines[j];
+				}
+			}
+			//新的任务分配给最先结束的机器
+			machines[finish] += taskTime[i];
+		}
+	}
+	return findMax(machines);//返回运行时间最长的时间
+}
+
+
+int main()
+{
+	int m,n;
+	cout << "请输入作业数和机器数：";
+	cin >> n >> m;
+
+	vector<int> workTime(n);
+	cout << "请输入工作时间:";
+	for (int i = 0; i < n; ++i)
+	{
+		cin >> workTime[i];
+	}
+
+	cout << m << "台机器最短作业时间是:" << getMatTime(workTime, m) << endl;
+
+	return 0;
+}
